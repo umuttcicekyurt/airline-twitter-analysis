@@ -17,7 +17,7 @@ import os
 from typing import Dict
 
 
-input_dir = "../data1"  
+input_dir = "../data"  
 output_dir = "../cleaned"  
 
 keep_fields = ["created_at", "id_str", "text","truncated","in_reply_to_user_id_str" ,"user" , "quoted_status_id_str","quote_count","reply_count","lang"]
