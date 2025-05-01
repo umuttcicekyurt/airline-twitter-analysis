@@ -13,10 +13,12 @@ Cleaning:
 '''
 
 import json
+import os
 from typing import Dict
 
-input_file = "../data/airlines-1558527599826.json"      
-output_file = "../cleaned/airlines-1558527599826_cleaned.json" 
+
+input_dir = "../data1"  
+output_dir = "../cleaned"  
 
 keep_fields = ["created_at", "id_str", "text","truncated","in_reply_to_user_id_str" ,"user" , "quoted_status_id_str","quote_count","reply_count","lang"]
 keep_user_fields = ["id_str", "followers_count", "friends_count", "statuses_count", "created_at"]
@@ -46,17 +48,25 @@ def keeping_attributes(tweet: Dict):
             }
     return cleaned_tweet
 
-with open(input_file, "r", encoding="utf-8") as f:
-    for line in f:
-        tweet = json.loads(line)
-        if valid_tweet(tweet):
-            cleaned_tweet = keeping_attributes(tweet)
-            cleaned.append(cleaned_tweet)
+for filename in os.listdir(input_dir):
+    if filename.endswith(".json"):
+        input_path = os.path.join(input_dir, filename)
+        output_path = os.path.join(output_dir, filename.replace(".json", "_cleaned.json"))
+        cleaned = []
 
-with open(output_file, "w", encoding="utf-8") as f:
-    for tweet in cleaned:
-        json.dump(tweet, f)
-        f.write("\n")
+        with open(input_path, "r", encoding="utf-8") as f:
+            for line in f:
+                try:
+                    tweet = json.loads(line)
+                    if valid_tweet(tweet):
+                        cleaned_tweet = keeping_attributes(tweet)
+                        cleaned.append(cleaned_tweet)
+                except json.JSONDecodeError:
+                    continue  
 
+        with open(output_path, "w", encoding="utf-8") as f:
+            for tweet in cleaned:
+                json.dump(tweet, f)
+                f.write("\n")
 
 print("done cleaning")
