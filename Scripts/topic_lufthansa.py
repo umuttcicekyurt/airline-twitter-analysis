@@ -117,7 +117,7 @@ clf = pipeline(
     "zero-shot-classification",
     model="valhalla/distilbart-mnli-12-3",
     multi_label=True,
-    device=-1               # CPU
+    device=0               # CPU
 )
 
 BATCH_SZ = 8                # <<— tune up / down to taste
