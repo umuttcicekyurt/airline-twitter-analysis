@@ -14,6 +14,8 @@ import re, csv, json, random
 from collections import defaultdict
 from transformers import pipeline
 from tqdm import tqdm
+from transformers.pipelines.pt_utils import KeyDataset
+import torch
 
 
 # ─────────────────────────────────────────────────────────────
@@ -69,7 +71,7 @@ BOOST = 0.15
 # ─────────────────────────────────────────────────────────────
 # 3)  LOAD TWEETS
 # ─────────────────────────────────────────────────────────────
-with open("airline-twitter-analysis/conversations_with_lufthansa.json",
+with open("conversations_with_AirFrance.json", #CHANGE THIS FOR OTHER AIRLINES
           encoding="utf-8") as f:
     nested = json.load(f)
 
@@ -113,12 +115,17 @@ if SAMPLE_THREADS is not None:
 
 # 4)  ZERO-SHOT PIPELINE  +  classify() helper
 # ─────────────────────────────────────────────
+device = 0 if torch.cuda.is_available() else -1
+
 clf = pipeline(
     "zero-shot-classification",
     model="valhalla/distilbart-mnli-12-3",
     multi_label=True,
-    device=0               # CPU
+    device=device
 )
+
+print("🖥 Using", "GPU" if device == 0 else "CPU")
+
 
 BATCH_SZ = 8                # <<— tune up / down to taste
 
@@ -243,7 +250,7 @@ fieldnames = [
     "created_at", "conversation_index", "text_raw"
 ]
 
-with open("tweets_classified.csv", "w", newline="", encoding="utf-8") as f:
+with open("tweets_classified_AirFrance.csv", "w", newline="", encoding="utf-8") as f:
     w = csv.DictWriter(f, fieldnames=fieldnames)
     w.writeheader()
     w.writerows(rows)
